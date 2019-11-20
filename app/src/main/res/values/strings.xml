@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Nube</string>
+    <string name="userName">Nombre de usuario</string>
+    <string name="pass">Contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="logout">Cerrar sesión</string>
+</resources>

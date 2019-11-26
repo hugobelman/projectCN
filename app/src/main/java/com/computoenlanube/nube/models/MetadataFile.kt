@@ -6,5 +6,5 @@ data class MetadataFile(
     val titulo : String,
     val nom_or : String,
     val tipo : String,
-    val size : Int
+    val size : Long
 )

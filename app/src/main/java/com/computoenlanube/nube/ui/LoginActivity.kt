@@ -1,21 +1,22 @@
-package com.computoenlanube.nube
+package com.computoenlanube.nube.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.computoenlanube.nube.R
 import com.computoenlanube.nube.models.AddResponse
 import com.computoenlanube.nube.models.ApiClient
 import com.computoenlanube.nube.models.LogResponse
 import com.computoenlanube.nube.models.User
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.progressBar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private var loading = false
     set(value) {
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             ApiClient.cloudService.login(user).enqueue(object : Callback<LogResponse> {
                 override fun onFailure(call: Call<LogResponse>, t: Throwable) {
                     loading = false
-                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_LONG).show()
                 }
 
                 override fun onResponse(call: Call<LogResponse>, response: Response<LogResponse>) {
@@ -48,10 +49,10 @@ class MainActivity : AppCompatActivity() {
                     val body = response.body()!!
 
                     if (body.log) {
-                        ApiClient.setAuthCookie(this@MainActivity, response.headers().get("Set-Cookie")!!)
+                        ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
                         startApp()
                     }
-                    else Toast.makeText(this@MainActivity, body.status, Toast.LENGTH_SHORT).show()
+                    else Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
                 }
 
             })
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<AddResponse>, t: Throwable) {
                     loading = false
 
-                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onResponse(call: Call<AddResponse>, response: Response<AddResponse>) {
@@ -76,10 +77,10 @@ class MainActivity : AppCompatActivity() {
                     val userWasAdded = body.add ?: false
 
                     if (userWasAdded) {
-                        ApiClient.setAuthCookie(this@MainActivity, response.headers().get("Set-Cookie")!!)
+                        ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
                         startApp()
                     }
-                    else Toast.makeText(this@MainActivity, body.status, Toast.LENGTH_LONG).show()
+                    else Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_LONG).show()
                 }
 
             })
@@ -103,8 +104,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startApp() {
-        val intent = Intent(this@MainActivity, FilesActivity::class.java)
+        val intent = Intent(this@LoginActivity, FilesActivity::class.java)
         startActivity(intent)
-        this@MainActivity.finish()
+        this@LoginActivity.finish()
     }
 }

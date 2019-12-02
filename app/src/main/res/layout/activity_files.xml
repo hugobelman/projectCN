@@ -22,7 +22,7 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="75dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +34,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="@+id/progressBar">
 
     </ListView>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="162dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:fontFamily="@font/amatica_sc_bold"
+        android:includeFontPadding="false"
+        android:shadowColor="#886405"
+        android:shadowDx="2"
+        android:shadowDy="3"
+        android:shadowRadius="50"
+        android:text="Archivos"
+        android:textColor="@color/colorAccent"
+        android:textSize="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

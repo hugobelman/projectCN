@@ -83,11 +83,15 @@ class FilesActivity : AppCompatActivity() {
                             loading = false
                             val deleteResponse = response.body()
 
-                            if (deleteResponse != null && !deleteResponse.error) {
-                                Snackbar.make(view, "El archivo ha sido borrado correctamente", Snackbar.LENGTH_SHORT).show()
-                                getFilesAndShowInListView()
-                            } else {
-                                Snackbar.make(view, "El archivo no fue borrado", Snackbar.LENGTH_SHORT).show()
+                            when {
+                                deleteResponse?.error == null -> ApiClient.showError(this@FilesActivity, response.code())
+
+                                !deleteResponse.error -> {
+                                    Snackbar.make(view, "El archivo ha sido borrado correctamente", Snackbar.LENGTH_SHORT).show()
+                                    getFilesAndShowInListView()
+                                }
+
+                                else -> Snackbar.make(view, deleteResponse.status ?: "El archivo no fue borrado: error en el servidor", Snackbar.LENGTH_SHORT).show()
                             }
                         }
 
@@ -101,27 +105,17 @@ class FilesActivity : AppCompatActivity() {
             return@setOnItemLongClickListener true
         }
 
-        getFilesAndShowInListView()
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_files, menu)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.logout_menuItem -> logout()
-
-
-            R.id.changePass_menuItem -> {
-                val intent = Intent(this, ChangePasswordActivity::class.java)
-                startActivityForResult(intent, 2)
-            }
+        changePass_btn.setOnClickListener {
+            val intent = Intent(this, ChangePasswordActivity::class.java)
+            startActivityForResult(intent, 2)
         }
 
-        return super.onOptionsItemSelected(item)
+        logout_btn.setOnClickListener {
+            logout()
+        }
+
+        getFilesAndShowInListView()
     }
 
     private fun logout() {
@@ -150,7 +144,15 @@ class FilesActivity : AppCompatActivity() {
     private fun getFilesAndShowInListView() {
         ApiClient.cloudService.getAllFiles(authCookie).enqueue(object : Callback<List<MetadataFile>> {
             override fun onFailure(call: Call<List<MetadataFile>>, t: Throwable) {
-                Toast.makeText(this@FilesActivity, t.message, Toast.LENGTH_SHORT).show()
+                 AlertDialog.Builder(this@FilesActivity).apply {
+                     setTitle("Error al obtener los archivos")
+                     setMessage("Ocurrio un error al obtener los archivos: ${t.message}")
+                     setPositiveButton("Cerrar sesión") { _,_ ->
+                         logout()
+                     }
+                     setCancelable(false)
+                 }.show()
+
                 loading = false
             }
 

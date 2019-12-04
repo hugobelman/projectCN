@@ -60,7 +60,7 @@
         android:layout_width="258dp"
         android:layout_height="70dp"
         android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginEnd="130dp"
         android:fontFamily="@font/amatica_sc_bold"
         android:includeFontPadding="false"
         android:shadowColor="#886405"
@@ -69,9 +69,10 @@
         android:shadowRadius="50"
         android:text="Subir Archivo"
         android:textColor="@color/colorAccent"
-        android:textSize="50dp"
+        android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

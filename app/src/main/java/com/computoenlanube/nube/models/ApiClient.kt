@@ -2,6 +2,7 @@ package com.computoenlanube.nube.models
 
 import android.app.Activity
 import android.content.Context
+import androidx.appcompat.app.AlertDialog
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -45,5 +46,13 @@ object ApiClient {
             putString("cookie", null)
             commit()
         }
+    }
+
+    fun showError(context: Context, httpcode: Int) {
+        AlertDialog.Builder(context).apply {
+            setTitle("Error al comunicarse con el servidor")
+            setMessage("El servidor no está respondiendo como debería (HTTP code $httpcode)")
+            setPositiveButton("Aceptar", null)
+        }.show()
     }
 }

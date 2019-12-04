@@ -57,6 +57,11 @@ class UploadActivity : AppCompatActivity() {
             if (uri != null) {
                 val bytes = contentResolver.openInputStream(uri!!)!!.readBytes()
 
+                if (bytes.size > 1e+7) {
+                    Snackbar.make(it, "Solo se puede subir archivos menores a 10 MB", Snackbar.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 val requestBody = RequestBody.create(MediaType.parse(contentResolver.getType(uri!!)!!), bytes)
                 val formDataFile = MultipartBody.Part.createFormData("file", fileName, requestBody)
 

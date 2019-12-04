@@ -29,9 +29,11 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val authCookie = ApiClient.getAuthCookie(this)
+        /*val authCookie = ApiClient.getAuthCookie(this)
 
         if (authCookie != null) startApp()
+
+         */
 
         login_btn.setOnClickListener {
             val user = User(userName_til.editText!!.text.toString(), pass_til.editText!!.text.toString())
@@ -72,15 +74,9 @@ class LoginActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<AddResponse>, response: Response<AddResponse>) {
                     loading = false
 
-                    val body = response.body()!!
+                    val body = response.body()
 
-                    val userWasAdded = body.add ?: false
-
-                    if (userWasAdded) {
-                        ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
-                        startApp()
-                    }
-                    else Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, body?.status, Toast.LENGTH_LONG).show()
                 }
 
             })

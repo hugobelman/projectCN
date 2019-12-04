@@ -1,13 +1,17 @@
 package com.computoenlanube.nube.ui
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
 import android.app.DownloadManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,7 +19,9 @@ import android.widget.Toast
 import com.computoenlanube.nube.R
 import com.computoenlanube.nube.adapters.FilesAdapter
 import com.computoenlanube.nube.models.ApiClient
+import com.computoenlanube.nube.models.DeleteResponse
 import com.computoenlanube.nube.models.MetadataFile
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_files.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -44,7 +50,55 @@ class FilesActivity : AppCompatActivity() {
         }
 
         files_lv.setOnItemClickListener { adapterView, view, i, l ->
-            downloadFile(files[i])
+            val file = files[i]
+
+            val dialog = AlertDialog.Builder(this).apply {
+                setTitle("Archivo con extensión desconocida")
+                setMessage("¿Desea descargar el archivo ${file.nom_or}")
+                setPositiveButton("Si") { _, _ ->
+                    downloadFile(file)
+                }
+                setNegativeButton("No", null)
+            }
+
+            dialog.show()
+        }
+
+        files_lv.setOnItemLongClickListener { adapterView, view, i, l ->
+            val file = files[i]
+
+            val dialog = AlertDialog.Builder(this).apply {
+                setTitle("¿Desea eliminar este archivo?")
+                setMessage("Se eliminará ${file.nom_or} y no se podrá recuperar")
+                setPositiveButton("Si") { _: DialogInterface, _: Int ->
+                    loading = true
+
+                    ApiClient.cloudService.deleteFile(authCookie, file.id_archivos).enqueue(object : Callback<DeleteResponse> {
+                        override fun onFailure(call: Call<DeleteResponse>, t: Throwable) {
+                            Toast.makeText(this@FilesActivity, t.message, Toast.LENGTH_SHORT).show()
+                            loading = false
+                        }
+
+                        override fun onResponse(call: Call<DeleteResponse>, response: Response<DeleteResponse>) {
+                            loading = false
+                            val deleteResponse = response.body()
+
+                            if (deleteResponse != null && !deleteResponse.error) {
+                                Snackbar.make(view, "El archivo ha sido borrado correctamente", Snackbar.LENGTH_SHORT).show()
+                                getFilesAndShowInListView()
+                            } else {
+                                Snackbar.make(view, "El archivo no fue borrado", Snackbar.LENGTH_SHORT).show()
+                            }
+                        }
+
+                    })
+                }
+                setNegativeButton("No",null)
+            }
+
+            dialog.show()
+
+            return@setOnItemLongClickListener true
         }
 
         getFilesAndShowInListView()
@@ -58,23 +112,35 @@ class FilesActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            R.id.logout_menuItem -> {
-                ApiClient.cloudService.logout(authCookie)
-                ApiClient.deleteAuthCookie(this)
+            R.id.logout_menuItem -> logout()
 
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-                this.finish()
+
+            R.id.changePass_menuItem -> {
+                val intent = Intent(this, ChangePasswordActivity::class.java)
+                startActivityForResult(intent, 2)
             }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
+    private fun logout() {
+        ApiClient.cloudService.logout(authCookie)
+        ApiClient.deleteAuthCookie(this)
+
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        this.finish()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when {
             requestCode == 1 && resultCode == Activity.RESULT_OK -> {
                 getFilesAndShowInListView()
+            }
+
+            requestCode == 2 && resultCode == Activity.RESULT_OK -> {
+                logout()
             }
         }
 

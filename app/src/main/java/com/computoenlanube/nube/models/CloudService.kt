@@ -21,4 +21,10 @@ interface CloudService {
     @Multipart
     @POST("/subir")
     fun uploadFile(@Header("Cookie") cookie: String, @Part file: MultipartBody.Part): Call<UploadResponse>
+
+    @DELETE("/del/{id}")
+    fun deleteFile(@Header("Cookie") cookie: String, @Path("id") fileId: Int): Call<DeleteResponse>
+
+    @PUT("/actualizar")
+    fun updatePass(@Header("Cookie") cookie: String, @Body newPass: NewPassBody): Call<NewPassResponse>
 }

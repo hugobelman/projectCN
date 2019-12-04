@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.UploadActivity"></activity>
+        <activity android:name=".ui.ChangePasswordActivity"></activity>
+        <activity android:name=".ui.UploadActivity" />
         <activity android:name=".ui.FilesActivity" />
         <activity android:name=".ui.LoginActivity">
             <intent-filter>

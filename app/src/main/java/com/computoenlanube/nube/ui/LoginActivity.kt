@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.computoenlanube.nube.R
 import com.computoenlanube.nube.models.AddResponse
 import com.computoenlanube.nube.models.ApiClient
@@ -15,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_main.progressBar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class LoginActivity : AppCompatActivity() {
 
@@ -29,12 +31,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*val authCookie = ApiClient.getAuthCookie(this)
-
-        if (authCookie != null) startApp()
-
-         */
-
         login_btn.setOnClickListener {
             val user = User(userName_til.editText!!.text.toString(), pass_til.editText!!.text.toString())
 
@@ -48,13 +44,18 @@ class LoginActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<LogResponse>, response: Response<LogResponse>) {
                     loading = false
 
-                    val body = response.body()!!
+                    val body = response.body()
 
-                    if (body.log) {
-                        ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
-                        startApp()
+                    when {
+                        body?.log == null -> ApiClient.showError(this@LoginActivity,  response.code())
+
+                        body.log -> {
+                            ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
+                            startApp()
+                        }
+
+                        body.log == false -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
                     }
-                    else Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
                 }
 
             })
@@ -76,7 +77,16 @@ class LoginActivity : AppCompatActivity() {
 
                     val body = response.body()
 
-                    Toast.makeText(this@LoginActivity, body?.status, Toast.LENGTH_LONG).show()
+                    when {
+                        body?.add == null -> ApiClient.showError(this@LoginActivity, response.code())
+
+                        body.add -> {
+                            ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
+                            startApp()
+                        }
+
+                        body.add == false -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
             })

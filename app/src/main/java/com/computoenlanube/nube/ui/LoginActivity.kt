@@ -35,30 +35,7 @@ class LoginActivity : AppCompatActivity() {
             val user = User(userName_til.editText!!.text.toString(), pass_til.editText!!.text.toString())
 
             loading = true
-            ApiClient.cloudService.login(user).enqueue(object : Callback<LogResponse> {
-                override fun onFailure(call: Call<LogResponse>, t: Throwable) {
-                    loading = false
-                    Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_LONG).show()
-                }
-
-                override fun onResponse(call: Call<LogResponse>, response: Response<LogResponse>) {
-                    loading = false
-
-                    val body = response.body()
-
-                    when {
-                        body?.log == null -> ApiClient.showError(this@LoginActivity,  response.code())
-
-                        body.log -> {
-                            ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
-                            startApp()
-                        }
-
-                        body.log == false -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-            })
+            login(user)
         }
 
         signup_btn.setOnClickListener {
@@ -78,14 +55,12 @@ class LoginActivity : AppCompatActivity() {
                     val body = response.body()
 
                     when {
-                        body?.add == null -> ApiClient.showError(this@LoginActivity, response.code())
+                        body?.add == null && body?.status == null -> ApiClient.showError(this@LoginActivity, response.code())
 
-                        body.add -> {
-                            ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
-                            startApp()
-                        }
+                        body.add == null || !body.add -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
 
-                        body.add == false -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
+                        body.add -> login(user)
+
                     }
                 }
 
@@ -113,5 +88,32 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(this@LoginActivity, FilesActivity::class.java)
         startActivity(intent)
         this@LoginActivity.finish()
+    }
+
+    private fun login(user: User) {
+        ApiClient.cloudService.login(user).enqueue(object : Callback<LogResponse> {
+            override fun onFailure(call: Call<LogResponse>, t: Throwable) {
+                loading = false
+                Toast.makeText(this@LoginActivity, t.message, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onResponse(call: Call<LogResponse>, response: Response<LogResponse>) {
+                loading = false
+
+                val body = response.body()
+
+                when {
+                    body?.log == null -> ApiClient.showError(this@LoginActivity,  response.code())
+
+                    body.log -> {
+                        ApiClient.setAuthCookie(this@LoginActivity, response.headers().get("Set-Cookie")!!)
+                        startApp()
+                    }
+
+                    body.log == false -> Toast.makeText(this@LoginActivity, body.status, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        })
     }
 }

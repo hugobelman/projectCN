@@ -59,7 +59,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/imageButton5"
+        android:id="@+id/logout_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -70,13 +70,13 @@
         app:srcCompat="@drawable/logoutxhdpi" />
 
     <ImageButton
-        android:id="@+id/imageButton6"
+        android:id="@+id/changePass_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="35dp"
         android:background="#00FFFFFF"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton5"
+        app:layout_constraintEnd_toStartOf="@+id/logout_btn"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/lockxhdpi" />
 

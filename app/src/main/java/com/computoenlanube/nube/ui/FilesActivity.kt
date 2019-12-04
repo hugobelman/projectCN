@@ -1,5 +1,6 @@
 package com.computoenlanube.nube.ui
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -7,6 +8,7 @@ import android.app.DownloadManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,6 +18,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.computoenlanube.nube.R
 import com.computoenlanube.nube.adapters.FilesAdapter
 import com.computoenlanube.nube.models.ApiClient
@@ -175,20 +179,27 @@ class FilesActivity : AppCompatActivity() {
     }
 
     private fun downloadFile(metadataFile: MetadataFile) {
-        val uri = Uri.parse("${ApiClient.BASE_URL}/download/${metadataFile.titulo}")
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1)
+        } else {
+            val uri = Uri.parse("${ApiClient.BASE_URL}/download/${metadataFile.titulo}")
 
-        val request = DownloadManager.Request(uri)
+            val request = DownloadManager.Request(uri)
 
-        request.apply {
-            addRequestHeader("Cookie", ApiClient.getAuthCookie(this@FilesActivity))
-            setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-            setTitle(metadataFile.nom_or)
-            setDescription("Descargando ${metadataFile.nom_or}...")
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, metadataFile.nom_or)
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            request.apply {
+                addRequestHeader("Cookie", ApiClient.getAuthCookie(this@FilesActivity))
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                setTitle(metadataFile.nom_or)
+                setDescription("Descargando ${metadataFile.nom_or}...")
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, metadataFile.nom_or)
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            }
+
+            val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
         }
-
-        val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        downloadManager.enqueue(request)
     }
 }
